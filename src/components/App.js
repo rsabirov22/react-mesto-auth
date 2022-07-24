@@ -170,7 +170,6 @@ function App() {
   }, []);
 
   React.useEffect(() => {
-    // tokenCheck();
     const jwt = localStorage.getItem('jwt');
     if (jwt) {
       auth(jwt);
@@ -183,31 +182,6 @@ function App() {
     }
   }, [loggedIn])
 
-  // const handleLogin = () => {
-  //   setLoggedIn(true);
-  // }
-
-  // const tokenCheck = () => {
-  //   const jwt = localStorage.getItem('jwt');
-
-  //   if (jwt) {
-  //     mestoAuth.getContent(jwt)
-  //     .then((res) => {
-  //       // console.log(res)
-  //       if (res) {
-  //         const { email, _id } = res;
-
-  //         setLoggedIn(true);
-  //         setUserData({
-  //           email,
-  //           _id
-  //         });
-  //         history.push('/');
-  //       }
-  //     })
-  //   }
-  // }
-
   return (
     <div className="page">
       <div className="page__container">
@@ -215,9 +189,9 @@ function App() {
             <Header logo={logo} userData={userData} loggedIn={loggedIn} signOut={signOut} />
             <Switch>
               <ProtectedRoute
+                component={Main}
                 exact
                 path="/"
-                component={Main}
                 cards={cards}
                 onCardLike={handleCardLike}
                 onCardDelete={handleCardDelete}

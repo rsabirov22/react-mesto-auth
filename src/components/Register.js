@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import * as mestoAuth from '../mestoAuth.js';
 
 function Register({ onRegister }) {
   const [email, setEmail] = useState('');
