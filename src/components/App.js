@@ -14,34 +14,24 @@ import Login from './Login';
 import Register from './Register';
 import ProtectedRoute from './ProtectedRoute';
 import * as mestoAuth from '../mestoAuth.js';
+import InfoTooltip from './InfoTooltip';
 
 function App() {
   const [cards, setCards] = React.useState([]);
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
+  const [isInfoTooltipOpen, setisInfoTooltipOpen] = React.useState(false);
   const [selectedCard, setSelectedCard] = React.useState({});
   const [currentUser, setCurrentUser] = React.useState({});
   const [userData, setUserData] = React.useState({});
   const [loggedIn, setLoggedIn] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState('');
   const history = useHistory();
 
-
-  // console.log(userData)
-
-  // const auth = async (jwt) => {
-  //   const content = await mestoAuth.getContent(jwt).then((res) => {
-  //     if (res) {
-  //       const { email, username } = res;
-  //       setLoggedIn(true);
-  //       setUserData({
-  //         username,
-  //         email
-  //       })
-  //     }
-  //   })
-  //   return content;
-  // }
+  // console.log(loggedIn);
+  // console.log(userData);
+  // console.log(errorMessage);
 
   function handleEditAvatarClick() {
     setIsEditAvatarPopupOpen(true);
@@ -63,6 +53,7 @@ function App() {
     setIsEditProfilePopupOpen(false);
     setIsEditAvatarPopupOpen(false);
     setIsAddPlacePopupOpen(false);
+    setisInfoTooltipOpen(false);
     setSelectedCard({})
   }
 
@@ -111,6 +102,53 @@ function App() {
       .catch(err => console.log(err));
   }
 
+  const auth = async (jwt) => {
+    const content = await mestoAuth.getContent(jwt).then((res) => {
+      if (res) {
+        // console.log(res)
+        setLoggedIn(true);
+        setUserData({
+          id: res.data._id,
+          email: res.data.email
+        });
+      }
+    })
+    .catch(err => console.log(err));
+
+    return content;
+  }
+
+  const onRegister = ({ password, email }) => {
+    return mestoAuth.register(password, email)
+    .then((res) => {
+      if (res.data) {
+        setErrorMessage('');
+      }
+      setisInfoTooltipOpen(true);
+    })
+    .catch(err => {
+      setErrorMessage(err);
+      setisInfoTooltipOpen(true);
+    });
+  }
+
+  const onLogin = ({ password, email }) => {
+    return mestoAuth.authorize(password, email)
+    .then((data) => {
+      if (data.token) {
+        localStorage.setItem('jwt', data.token);
+        setLoggedIn(true);
+      }
+    })
+    .catch(err => console.log(err));
+  }
+
+  const signOut = () => {
+    localStorage.removeItem('jwt');
+    setLoggedIn(false);
+    history.push('/sign-in');
+  }
+
   React.useEffect(() => {
     // Загрузка информации о пользователе
     api.getProfile()
@@ -132,69 +170,53 @@ function App() {
   }, []);
 
   React.useEffect(() => {
-    tokenCheck();
-    // const jwt = localStorage.getItem('jwt');
-    // if (jwt) {
-    //   auth(jwt);
-    // }
+    // tokenCheck();
+    const jwt = localStorage.getItem('jwt');
+    if (jwt) {
+      auth(jwt);
+    }
   }, [loggedIn]);
 
   React.useEffect(() => {
     if (loggedIn) {
-      history.push('/main');
+      history.push('/');
     }
   }, [loggedIn])
 
-  const onRegister = ({ password, email }) => {
-    return mestoAuth.register(password, email).then((res) => {
-      if (!res || res.statusCode === 400) throw new Error('некорректно заполнено одно из полей');
-      return res;
-    });
-  }
+  // const handleLogin = () => {
+  //   setLoggedIn(true);
+  // }
 
-  const handleLogin = () => {
-    setLoggedIn(true);
-  }
+  // const tokenCheck = () => {
+  //   const jwt = localStorage.getItem('jwt');
 
-  const tokenCheck = () => {
-    const jwt = localStorage.getItem('jwt');
+  //   if (jwt) {
+  //     mestoAuth.getContent(jwt)
+  //     .then((res) => {
+  //       // console.log(res)
+  //       if (res) {
+  //         const { email, _id } = res;
 
-    if (jwt) {
-      mestoAuth.getContent(jwt)
-      .then((res) => {
-        if (res) {
-          const { email, id } = res;
-
-          setLoggedIn(true);
-          setUserData({
-            email,
-            id
-          });
-          history.push('/main');
-        }
-      })
-    }
-  }
-
-  // const onLogin = ({ password, email }) => {
-  //   return mestoAuth.authorize(password, email)
-  //     .then((data) => {
-  //       if (data.token) {
-  //         localStorage.setItem('jwt', data.token);
   //         setLoggedIn(true);
+  //         setUserData({
+  //           email,
+  //           _id
+  //         });
+  //         history.push('/');
   //       }
-  //     });
+  //     })
+  //   }
   // }
 
   return (
     <div className="page">
       <div className="page__container">
         <CurrentUserContext.Provider value={currentUser}>
-            <Header logo={logo} userData={userData} loggedIn={loggedIn}/>
+            <Header logo={logo} userData={userData} loggedIn={loggedIn} signOut={signOut} />
             <Switch>
               <ProtectedRoute
                 exact
-                path="/main"
+                path="/"
                 component={Main}
                 cards={cards}
                 onCardLike={handleCardLike}
@@ -204,21 +226,20 @@ function App() {
                 onEditAvatar={handleEditAvatarClick}
                 onCardClick={handleCardClick}
                 loggedIn={loggedIn}
-                />
+              />
               <Route path="/sign-in">
-                <div className="loginContainer">
-                  <Login handleLogin={handleLogin} />
-                </div>
+                <Login onLogin={onLogin} />
               </Route>
               <Route path="/sign-up">
-                <div className="registerContainer">
-                  <Register onRegister={onRegister} />
-                </div>
+                <Register onRegister={onRegister} />
               </Route>
-              <Route>
-                {loggedIn ? <Redirect to="/main" /> : <Redirect to="/sign-in" />}
+              <Route path="/">
+                {loggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
               </Route>
             </Switch>
+            {/* <Login onLogin={onLogin} /> */}
+            {/* <Register onRegister={onRegister} /> */}
+            <InfoTooltip isOpen={isInfoTooltipOpen} onClose={closeAllPopups} errorMessage={errorMessage} />
             <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser}/>
             <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar}/>
             <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlaceSubmit} />

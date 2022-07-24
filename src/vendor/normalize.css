@@ -11,6 +11,8 @@
  html {
   line-height: 1.15; /* 1 */
   -webkit-text-size-adjust: 100%; /* 2 */
+  height: 100%; /* fallback for IE 4-6 and older browsers */
+  height: 100vh;/* for modern browsers */
 }
 
 /* Sections
@@ -22,6 +24,9 @@
 
 body {
   margin: 0;
+  height: auto; /* required to allow content to grow without overflow */
+  min-height: 100%; /* fallback for IE 4-6 and older browsers */
+  min-height: 100vh;/* for modern browsers */
 }
 
 /**

@@ -1,3 +1,5 @@
+import { handleResponse } from './utils/utils.js';
+
 export const BASE_URL = 'https://auth.nomoreparties.co';
 
 export const register = (password, email) => {
@@ -9,9 +11,7 @@ export const register = (password, email) => {
     },
     body: JSON.stringify({ password, email })
   })
-    .then((response) => {
-      return response.json();
-    })
+  .then(handleResponse);
 };
 export const authorize = (password, email) => {
   return fetch(`${BASE_URL}/signin`, {
@@ -22,16 +22,7 @@ export const authorize = (password, email) => {
     },
     body: JSON.stringify({ password, email })
   })
-    .then((response => response.json()))
-    .then((data) => {
-      if (data.token){
-        localStorage.setItem('jwt', data.token);
-        return data;
-      } else {
-        return;
-      }
-    })
-    .catch(err => console.log(err))
+  .then(handleResponse);
 };
 export const getContent = (token) => {
   return fetch(`${BASE_URL}/users/me`, {
@@ -42,6 +33,5 @@ export const getContent = (token) => {
       'Authorization': `Bearer ${token}`,
     }
   })
-  .then(res => res.json())
-  .then(data => data)
+  .then(handleResponse);
 }

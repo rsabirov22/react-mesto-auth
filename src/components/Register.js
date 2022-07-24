@@ -5,14 +5,13 @@ import * as mestoAuth from '../mestoAuth.js';
 function Register({ onRegister }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
   const history = useHistory();
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     onRegister({ password, email })
-      .then(() => history.push('/sign-in'))
+    .then(() => history.push('/sign-in'))
       // .catch((err) => setMessage(err.message || 'некорректно заполнено одно из полей'));
   }
 
@@ -46,7 +45,7 @@ function Register({ onRegister }) {
       </form>
       <div className="auth__signup">
         <p className="auth__phrase">Уже зарегистрированы?</p>
-        <Link to="/register" className="auth__link">Войти</Link>
+        <Link to="/sign-in" className="auth__link">Войти</Link>
       </div>
     </div>
   );
