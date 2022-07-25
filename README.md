@@ -12,7 +12,9 @@
 
 Валидацию форм и индикаторы загрузки запросов, закрытие попапов по нажатию на Esc и оверлей.
 
+**Ссылка на GitHub Pages**
 
+https://rsabirov22.github.io/react-mesto-auth/index.html
 
 
 
