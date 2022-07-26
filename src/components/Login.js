@@ -1,23 +1,19 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import * as mestoAuth from '../mestoAuth.js';
 
 function Login({ onLogin }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  // const [message, setMessage] = useState('');
   const history = useHistory();
   const resetForm = () => {
     setEmail('');
     setPassword('');
-    // setMessage('');
   }
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     onLogin({ password, email })
-    .then(() => history.push('/'))
     .then(() => resetForm());
   }
 

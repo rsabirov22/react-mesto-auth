@@ -11,7 +11,6 @@ function Register({ onRegister }) {
 
     onRegister({ password, email })
     .then(() => history.push('/sign-in'))
-      // .catch((err) => setMessage(err.message || 'некорректно заполнено одно из полей'));
   }
 
   return (

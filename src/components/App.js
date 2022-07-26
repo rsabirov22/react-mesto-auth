@@ -29,10 +29,6 @@ function App() {
   const [errorMessage, setErrorMessage] = React.useState('');
   const history = useHistory();
 
-  // console.log(loggedIn);
-  // console.log(userData);
-  // console.log(errorMessage);
-
   function handleEditAvatarClick() {
     setIsEditAvatarPopupOpen(true);
   };
@@ -105,7 +101,6 @@ function App() {
   const auth = async (jwt) => {
     const content = await mestoAuth.getContent(jwt).then((res) => {
       if (res) {
-        // console.log(res)
         setLoggedIn(true);
         setUserData({
           id: res.data._id,
@@ -133,14 +128,17 @@ function App() {
   }
 
   const onLogin = ({ password, email }) => {
-    return mestoAuth.authorize(password, email)
-    .then((data) => {
-      if (data.token) {
-        localStorage.setItem('jwt', data.token);
-        setLoggedIn(true);
-      }
-    })
-    .catch(err => console.log(err));
+    if (password && email) {
+      return mestoAuth.authorize(password, email)
+      .then((data) => {
+        if (data.token) {
+          localStorage.setItem('jwt', data.token);
+          setLoggedIn(true);
+          history.push('/');
+        }
+      })
+      .catch(err => console.log(err));
+    }
   }
 
   const signOut = () => {
@@ -171,9 +169,18 @@ function App() {
 
   React.useEffect(() => {
     const jwt = localStorage.getItem('jwt');
+    // проверка наличия токена и валидности токена
     if (jwt) {
-      auth(jwt);
+      mestoAuth.getContent(jwt)
+      .then((res) => {
+        if (res) {
+          auth(jwt);
+        } else {
+          history.push('/sign-in');
+        }
+      })
     }
+    // проверка наличия токена и валидности токена
   }, [loggedIn]);
 
   React.useEffect(() => {
@@ -211,8 +218,6 @@ function App() {
                 {loggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
               </Route>
             </Switch>
-            {/* <Login onLogin={onLogin} /> */}
-            {/* <Register onRegister={onRegister} /> */}
             <InfoTooltip isOpen={isInfoTooltipOpen} onClose={closeAllPopups} errorMessage={errorMessage} />
             <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser}/>
             <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar}/>
