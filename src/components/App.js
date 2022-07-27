@@ -118,6 +118,7 @@ function App() {
     .then((res) => {
       if (res.data) {
         setErrorMessage('');
+        history.push('/sign-in');
       }
       setisInfoTooltipOpen(true);
     })

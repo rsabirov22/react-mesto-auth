@@ -9,8 +9,7 @@ function Register({ onRegister }) {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    onRegister({ password, email })
-    .then(() => history.push('/sign-in'))
+    onRegister({ password, email });
   }
 
   return (
