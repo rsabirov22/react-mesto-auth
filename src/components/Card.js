@@ -6,7 +6,7 @@ function Card({ card, onCardClick, onCardLike, onCardDelete }) {
   const isOwn = card.owner._id === currentUser._id;
   const isLiked = card.likes.some(i => i._id === currentUser._id);
 
-  function handleClick() {
+  function handleImageClick() {
     onCardClick(card);
   }
 
@@ -20,7 +20,7 @@ function Card({ card, onCardClick, onCardLike, onCardDelete }) {
 
   return (
     <div className="element">
-      <img className="element__image" src={card.link} alt={card.name} onClick={handleClick}/>
+      <img className="element__image" src={card.link} alt={card.name} onClick={handleImageClick}/>
       <div className="element__description">
         <p className="element__title">{card.name}</p>
         <div className="element__likes">

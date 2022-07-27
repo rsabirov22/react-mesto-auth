@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 
 function Header({ logo, userData, loggedIn, signOut }) {
-  let location = useLocation();
+  const location = useLocation();
 
   return (
     <header className="header">

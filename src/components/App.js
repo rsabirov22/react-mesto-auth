@@ -21,7 +21,7 @@ function App() {
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
-  const [isInfoTooltipOpen, setisInfoTooltipOpen] = React.useState(false);
+  const [isInfoTooltipOpen, setIsInfoTooltipOpen] = React.useState(false);
   const [selectedCard, setSelectedCard] = React.useState({});
   const [currentUser, setCurrentUser] = React.useState({});
   const [userData, setUserData] = React.useState({});
@@ -49,7 +49,7 @@ function App() {
     setIsEditProfilePopupOpen(false);
     setIsEditAvatarPopupOpen(false);
     setIsAddPlacePopupOpen(false);
-    setisInfoTooltipOpen(false);
+    setIsInfoTooltipOpen(false);
     setSelectedCard({})
   }
 
@@ -119,12 +119,15 @@ function App() {
       if (res.data) {
         setErrorMessage('');
         history.push('/sign-in');
+      } else {
+        setErrorMessage(res.error);
+        setIsInfoTooltipOpen(true);
       }
-      setisInfoTooltipOpen(true);
+      setIsInfoTooltipOpen(true);
     })
     .catch(err => {
       setErrorMessage(err);
-      setisInfoTooltipOpen(true);
+      setIsInfoTooltipOpen(true);
     });
   }
 
@@ -136,9 +139,15 @@ function App() {
           localStorage.setItem('jwt', data.token);
           setLoggedIn(true);
           history.push('/');
+        } else {
+          setErrorMessage(data.error);
+          setIsInfoTooltipOpen(true);
         }
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        setErrorMessage(err);
+        setIsInfoTooltipOpen(true);
+      });
     }
   }
 
@@ -149,26 +158,6 @@ function App() {
   }
 
   React.useEffect(() => {
-    // Загрузка информации о пользователе
-    api.getProfile()
-      .then((data) => {
-        setCurrentUser(data)
-      })
-      .catch(err => console.log(err));
-    // Загрузка информации о пользователе
-  }, []);
-
-  React.useEffect(() => {
-    // Загрузка карточек
-    api.getInitialCards()
-      .then((data) => {
-        setCards(data)
-      })
-      .catch(err => console.log(err));
-    // Загрузка карточек
-  }, []);
-
-  React.useEffect(() => {
     const jwt = localStorage.getItem('jwt');
     // проверка наличия токена и валидности токена
     if (jwt) {
@@ -177,11 +166,37 @@ function App() {
         if (res) {
           auth(jwt);
         } else {
+          localStorage.removeItem('jwt');
           history.push('/sign-in');
         }
       })
+      .catch(err => console.log(err));
     }
     // проверка наличия токена и валидности токена
+  }, []);
+
+  React.useEffect(() => {
+    // Загрузка информации о пользователе
+    if (loggedIn) {
+      api.getProfile()
+      .then((data) => {
+        setCurrentUser(data)
+      })
+      .catch(err => console.log(err));
+    }
+    // Загрузка информации о пользователе
+  }, [loggedIn]);
+
+  React.useEffect(() => {
+    // Загрузка карточек
+    if (loggedIn) {
+      api.getInitialCards()
+      .then((data) => {
+        setCards(data)
+      })
+      .catch(err => console.log(err));
+    }
+    // Загрузка карточек
   }, [loggedIn]);
 
   React.useEffect(() => {
@@ -219,11 +234,30 @@ function App() {
                 {loggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
               </Route>
             </Switch>
-            <InfoTooltip isOpen={isInfoTooltipOpen} onClose={closeAllPopups} errorMessage={errorMessage} />
-            <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser}/>
-            <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar}/>
-            <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlaceSubmit} />
-            <ImagePopup card={selectedCard} onClose={closeAllPopups}/>
+            <InfoTooltip
+              isOpen={isInfoTooltipOpen}
+              onClose={closeAllPopups}
+              errorMessage={errorMessage}
+            />
+            <EditProfilePopup
+              isOpen={isEditProfilePopupOpen}
+              onClose={closeAllPopups}
+              onUpdateUser={handleUpdateUser}
+            />
+            <EditAvatarPopup
+              isOpen={isEditAvatarPopupOpen}
+              onClose={closeAllPopups}
+              onUpdateAvatar={handleUpdateAvatar}
+            />
+            <AddPlacePopup
+              isOpen={isAddPlacePopupOpen}
+              onClose={closeAllPopups}
+              onAddPlace={handleAddPlaceSubmit}
+            />
+            <ImagePopup
+              card={selectedCard}
+              onClose={closeAllPopups}
+            />
             <Footer/>
         </CurrentUserContext.Provider>
       </div>

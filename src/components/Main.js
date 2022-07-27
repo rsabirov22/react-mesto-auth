@@ -4,6 +4,15 @@ import { CurrentUserContext } from '../contexts/CurrentUserContext';
 
 function Main({ onEditProfile, onAddPlace, onEditAvatar, onCardClick, cards, onCardLike, onCardDelete, loggedIn, userData }) {
   const currentUser = useContext(CurrentUserContext);
+  const cardsElements = cards.map(card => {
+    return <Card
+              card={card}
+              key={card._id}
+              onCardClick={onCardClick}
+              onCardLike={onCardLike}
+              onCardDelete={onCardDelete}
+            />
+  });
 
   return (
     <main className="content">
@@ -19,9 +28,7 @@ function Main({ onEditProfile, onAddPlace, onEditAvatar, onCardClick, cards, onC
         <button type="button" aria-label="Добавить" id="add-mesto" className="profile__add-button" onClick={onAddPlace}></button>
       </section>
       <section className="elements">
-        {cards.map(card => {
-          return <Card card={card} key={card._id} onCardClick={onCardClick} onCardLike={onCardLike} onCardDelete={onCardDelete}/>
-        })}
+        {cardsElements}
       </section>
     </main>
   );
